@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import GameCharacter from './GameCharacter';
 import GameBall from './GameBall';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
 interface GameState {
   trumpScore: number;
@@ -29,6 +29,7 @@ const INITIAL_BALL_SPEED = 4;
 const TrumpElonPong = () => {
   const gameRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>();
+  const audioRef = useRef<HTMLAudioElement>(null);
   
   const [gameState, setGameState] = useState<GameState>({
     trumpScore: 0,
@@ -44,6 +45,11 @@ const TrumpElonPong = () => {
   });
 
   const [keys, setKeys] = useState<Set<string>>(new Set());
+  const [musicMuted, setMusicMuted] = useState(false);
+
+  // Add vibration state for each image
+  const [trumpVibrate, setTrumpVibrate] = useState(false);
+  const [elonVibrate, setElonVibrate] = useState(false);
 
   const resetBall = useCallback(() => {
     setGameState(prev => ({
@@ -54,6 +60,16 @@ const TrumpElonPong = () => {
       ballSpeedY: (Math.random() > 0.5 ? 1 : -1) * INITIAL_BALL_SPEED,
     }));
   }, []);
+
+  const triggerVibration = (side: 'trump' | 'elon') => {
+    if (side === 'trump') {
+      setTrumpVibrate(true);
+      setTimeout(() => setTrumpVibrate(false), 250);
+    } else {
+      setElonVibrate(true);
+      setTimeout(() => setElonVibrate(false), 250);
+    }
+  };
 
   const updateGame = useCallback(() => {
     if (!gameState.gameRunning || gameState.gamePaused) return;
@@ -93,6 +109,7 @@ const TrumpElonPong = () => {
         newState.ballSpeedX = Math.abs(newState.ballSpeedX) * 1.05;
         const relativeIntersectY = (newState.ballY - (newState.trumpY + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         newState.ballSpeedY = relativeIntersectY * 5;
+        triggerVibration('trump'); // Vibrate Trump image
       }
 
       // Ball collision with Elon paddle (right side)
@@ -104,6 +121,7 @@ const TrumpElonPong = () => {
         newState.ballSpeedX = -Math.abs(newState.ballSpeedX) * 1.05;
         const relativeIntersectY = (newState.ballY - (newState.elonY + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         newState.ballSpeedY = relativeIntersectY * 5;
+        triggerVibration('elon'); // Vibrate Elon image
       }
 
       // Score points - Random score between 10-50
@@ -155,6 +173,22 @@ const TrumpElonPong = () => {
     }
   }, [updateGame, gameState.gameRunning, gameState.gamePaused]);
 
+  // Play/pause music based on game state
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (gameState.gameRunning && !gameState.gamePaused && !musicMuted) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  }, [gameState.gameRunning, gameState.gamePaused, musicMuted]);
+
+  // Mute/unmute handler
+  const toggleMusic = () => {
+    setMusicMuted(m => !m);
+  };
+
   const startGame = () => {
     setGameState(prev => ({ ...prev, gameRunning: true, gamePaused: false }));
   };
@@ -196,11 +230,22 @@ const TrumpElonPong = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-orange-600 via-red-700 to-purple-900">
+      {/* Music audio element */}
+      <audio ref={audioRef} src="/music.mp3" loop autoPlay={false} muted={musicMuted} />
+      {/* Music mute/unmute button in top-right */}
+      <button
+        onClick={toggleMusic}
+        className="absolute top-4 right-4 z-30 bg-black/60 rounded-full p-2 hover:bg-black/80 transition-colors"
+        title={musicMuted ? 'Unmute Music' : 'Mute Music'}
+      >
+        {musicMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
+      </button>
+
       <div className="text-center mb-6">
-        <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-blue-500 mb-2 animate-pulse">
-          TRUMP ELON PONG
+        <h1 className="text-6xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-blue-500 mb-2 animate-pulse drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] font-serif">
+          TRUMP V/S ELON
         </h1>
-        <p className="text-xl text-white opacity-80">Epic Battle of the Titans!</p>
+        <p className="text-xl text-white opacity-90 font-medium font-sans drop-shadow">Epic Battle of the Titans!</p>
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -235,30 +280,32 @@ const TrumpElonPong = () => {
           className="relative border-4 border-yellow-400 overflow-hidden"
           style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
         >
-          {/* Split Background - Red for Trump, Blue for Elon */}
+          {/* Split Background */}
           <div className="absolute inset-0 flex">
             <div className="w-1/2 bg-gradient-to-r from-red-600 to-red-500 opacity-80" />
             <div className="w-1/2 bg-gradient-to-l from-blue-600 to-blue-500 opacity-80" />
           </div>
           
           {/* Large Trump Image covering left half */}
-          <div className="absolute left-0 top-0 w-1/2 h-full flex items-center justify-center opacity-40">
+          <div className="absolute left-0 bottom-0 w-1/2 h-3/4 flex items-end justify-center pointer-events-none z-10">
             <img 
               src="/lovable-uploads/61aaf673-f181-4a2f-af83-a2b4668e6d60.png" 
               alt="Trump" 
-              className="w-4/5 h-4/5 object-contain"
+              className={`w-[95%] h-auto max-h-[90%] object-contain drop-shadow-2xl transition-transform duration-150 
+                ${trumpVibrate ? 'animate-vibrate' : ''}`}
             />
           </div>
 
           {/* Large Elon Image covering right half */}
-          <div className="absolute right-0 top-0 w-1/2 h-full flex items-center justify-center opacity-40">
+          <div className="absolute right-0 bottom-0 w-1/2 h-3/4 flex items-end justify-center pointer-events-none z-10">
             <img 
               src="/lovable-uploads/1768c633-a05b-4c95-8d92-79edad70f2be.png" 
               alt="Elon" 
-              className="w-4/5 h-4/5 object-contain"
+              className={`w-[95%] h-auto max-h-[90%] object-contain drop-shadow-2xl transition-transform duration-150 
+                ${elonVibrate ? 'animate-vibrate' : ''}`}
             />
           </div>
-
+          
           {/* Score Display Inside Board */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-8 z-10">
             <div className="bg-red-600/80 text-white px-4 py-2 rounded-lg border-2 border-white">
@@ -340,5 +387,20 @@ const TrumpElonPong = () => {
     </div>
   );
 };
+
+// Add this to your global CSS (e.g., index.css or tailwind.css):
+/*
+@keyframes vibrate {
+  0% { transform: translateX(0) rotate(0deg);}
+  20% { transform: translateX(-4px) rotate(-2deg);}
+  40% { transform: translateX(4px) rotate(2deg);}
+  60% { transform: translateX(-3px) rotate(-1deg);}
+  80% { transform: translateX(3px) rotate(1deg);}
+  100% { transform: translateX(0) rotate(0deg);}
+}
+.animate-vibrate {
+  animation: vibrate 0.25s linear;
+}
+*/
 
 export default TrumpElonPong;
