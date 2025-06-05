@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import GameCharacter from './GameCharacter';
 import GameBall from './GameBall';
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
@@ -71,11 +70,19 @@ const TrumpElonPong = () => {
     }
   };
 
+  // Helper to get current speed multiplier based on total score
+  const getSpeedMultiplier = (trumpScore: number, elonScore: number) => {
+    const totalScore = trumpScore + elonScore;
+    // Increase speed every 50 points, up to 2x speed
+    return 1 + Math.min(Math.floor(totalScore / 50) * 0.15, 1);
+  };
+
   const updateGame = useCallback(() => {
     if (!gameState.gameRunning || gameState.gamePaused) return;
 
     setGameState(prev => {
       let newState = { ...prev };
+      const speedMultiplier = getSpeedMultiplier(newState.trumpScore, newState.elonScore);
 
       // Move paddles based on keys - Updated Elon controls to I/K
       if (keys.has('i') && newState.elonY > 0) {
@@ -92,8 +99,8 @@ const TrumpElonPong = () => {
       }
 
       // Move ball
-      newState.ballX += newState.ballSpeedX;
-      newState.ballY += newState.ballSpeedY;
+      newState.ballX += newState.ballSpeedX * speedMultiplier;
+      newState.ballY += newState.ballSpeedY * speedMultiplier;
 
       // Ball collision with top and bottom walls
       if (newState.ballY <= 0 || newState.ballY >= GAME_HEIGHT - BALL_SIZE) {
@@ -127,11 +134,11 @@ const TrumpElonPong = () => {
       // Score points - Random score between 10-50
       if (newState.ballX < 0) {
         newState.elonScore += Math.floor(Math.random() * 41) + 10; // 10-50
-        setTimeout(() => resetBall(), 1000);
+        setTimeout(() => resetBall(), 500);
       }
       if (newState.ballX > GAME_WIDTH) {
         newState.trumpScore += Math.floor(Math.random() * 41) + 10; // 10-50
-        setTimeout(() => resetBall(), 1000);
+        setTimeout(() => resetBall(), 500);
       }
 
       return newState;
@@ -325,24 +332,28 @@ const TrumpElonPong = () => {
             </div>
           </div>
           
-          {/* Trump Character */}
-          <GameCharacter
-            character="trump"
-            level={getTrumpLevel(gameState.trumpScore)}
-            x={0}
-            y={gameState.trumpY}
-            width={PADDLE_WIDTH}
-            height={PADDLE_HEIGHT}
+          {/* Trump Paddle (Stick) */}
+          <div
+            className="absolute z-20 bg-yellow-400"
+            style={{
+              left: 0,
+              top: gameState.trumpY,
+              width: 6,
+              height: PADDLE_HEIGHT,
+              borderRadius: 3,
+            }}
           />
 
-          {/* Elon Character */}
-          <GameCharacter
-            character="elon"
-            level={getElonLevel(gameState.elonScore)}
-            x={GAME_WIDTH - PADDLE_WIDTH}
-            y={gameState.elonY}
-            width={PADDLE_WIDTH}
-            height={PADDLE_HEIGHT}
+          {/* Elon Paddle (Stick) */}
+          <div
+            className="absolute z-20 bg-cyan-400"
+            style={{
+              left: GAME_WIDTH - PADDLE_WIDTH,
+              top: gameState.elonY,
+              width: 6,
+              height: PADDLE_HEIGHT,
+              borderRadius: 3,
+            }}
           />
 
           {/* Game Ball */}
