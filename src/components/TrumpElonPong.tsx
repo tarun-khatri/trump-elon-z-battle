@@ -62,11 +62,11 @@ const TrumpElonPong = () => {
     setGameState(prev => {
       let newState = { ...prev };
 
-      // Move paddles based on keys
-      if (keys.has('ArrowUp') && newState.elonY > 0) {
+      // Move paddles based on keys - Updated Elon controls to I/K
+      if (keys.has('i') && newState.elonY > 0) {
         newState.elonY -= PADDLE_SPEED;
       }
-      if (keys.has('ArrowDown') && newState.elonY < GAME_HEIGHT - PADDLE_HEIGHT) {
+      if (keys.has('k') && newState.elonY < GAME_HEIGHT - PADDLE_HEIGHT) {
         newState.elonY += PADDLE_SPEED;
       }
       if (keys.has('w') && newState.trumpY > 0) {
@@ -91,7 +91,7 @@ const TrumpElonPong = () => {
         newState.ballY >= newState.trumpY &&
         newState.ballY <= newState.trumpY + PADDLE_HEIGHT
       ) {
-        newState.ballSpeedX = Math.abs(newState.ballSpeedX) * 1.05; // Increase speed slightly
+        newState.ballSpeedX = Math.abs(newState.ballSpeedX) * 1.05;
         const relativeIntersectY = (newState.ballY - (newState.trumpY + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         newState.ballSpeedY = relativeIntersectY * 5;
       }
@@ -102,7 +102,7 @@ const TrumpElonPong = () => {
         newState.ballY >= newState.elonY &&
         newState.ballY <= newState.elonY + PADDLE_HEIGHT
       ) {
-        newState.ballSpeedX = -Math.abs(newState.ballSpeedX) * 1.05; // Increase speed slightly
+        newState.ballSpeedX = -Math.abs(newState.ballSpeedX) * 1.05;
         const relativeIntersectY = (newState.ballY - (newState.elonY + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         newState.ballSpeedY = relativeIntersectY * 5;
       }
@@ -180,19 +180,19 @@ const TrumpElonPong = () => {
   };
 
   const getTrumpLevel = (score: number) => {
-    if (score >= 100) return 4; // Ultra Instinct
-    if (score >= 60) return 3; // Super Saiyan 3
-    if (score >= 30) return 2; // Super Saiyan 2
-    if (score >= 10) return 1; // Super Saiyan
-    return 0; // Base form
+    if (score >= 100) return 4;
+    if (score >= 60) return 3;
+    if (score >= 30) return 2;
+    if (score >= 10) return 1;
+    return 0;
   };
 
   const getElonLevel = (score: number) => {
-    if (score >= 100) return 4; // Ultra Instinct
-    if (score >= 60) return 3; // Super Saiyan 3
-    if (score >= 30) return 2; // Super Saiyan 2
-    if (score >= 10) return 1; // Super Saiyan
-    return 0; // Base form
+    if (score >= 100) return 4;
+    if (score >= 60) return 3;
+    if (score >= 30) return 2;
+    if (score >= 10) return 1;
+    return 0;
   };
 
   return (
@@ -257,6 +257,24 @@ const TrumpElonPong = () => {
           {/* Game Area Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-blue-500/10 animate-pulse" />
           
+          {/* Trump Image on left side */}
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-24 h-32 opacity-30">
+            <img 
+              src="/lovable-uploads/61aaf673-f181-4a2f-af83-a2b4668e6d60.png" 
+              alt="Trump" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          {/* Elon Image on right side */}
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 w-24 h-32 opacity-30">
+            <img 
+              src="/lovable-uploads/1768c633-a05b-4c95-8d92-79edad70f2be.png" 
+              alt="Elon" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          
           {/* Trump Character */}
           <GameCharacter
             character="trump"
@@ -312,7 +330,7 @@ const TrumpElonPong = () => {
             <strong>Trump:</strong> W (Up) / S (Down)
           </div>
           <div>
-            <strong>Elon:</strong> ↑ (Up) / ↓ (Down)
+            <strong>Elon:</strong> I (Up) / K (Down)
           </div>
         </div>
       </div>
