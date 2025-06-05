@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -107,13 +106,13 @@ const TrumpElonPong = () => {
         newState.ballSpeedY = relativeIntersectY * 5;
       }
 
-      // Score points
+      // Score points - Random score between 10-50
       if (newState.ballX < 0) {
-        newState.elonScore += 10;
+        newState.elonScore += Math.floor(Math.random() * 41) + 10; // 10-50
         setTimeout(() => resetBall(), 1000);
       }
       if (newState.ballX > GAME_WIDTH) {
-        newState.trumpScore += 10;
+        newState.trumpScore += Math.floor(Math.random() * 41) + 10; // 10-50
         setTimeout(() => resetBall(), 1000);
       }
 
@@ -180,18 +179,18 @@ const TrumpElonPong = () => {
   };
 
   const getTrumpLevel = (score: number) => {
-    if (score >= 100) return 4;
-    if (score >= 60) return 3;
-    if (score >= 30) return 2;
-    if (score >= 10) return 1;
+    if (score >= 200) return 4;
+    if (score >= 150) return 3;
+    if (score >= 100) return 2;
+    if (score >= 50) return 1;
     return 0;
   };
 
   const getElonLevel = (score: number) => {
-    if (score >= 100) return 4;
-    if (score >= 60) return 3;
-    if (score >= 30) return 2;
-    if (score >= 10) return 1;
+    if (score >= 200) return 4;
+    if (score >= 150) return 3;
+    if (score >= 100) return 2;
+    if (score >= 50) return 1;
     return 0;
   };
 
@@ -204,75 +203,79 @@ const TrumpElonPong = () => {
         <p className="text-xl text-white opacity-80">Epic Battle of the Titans!</p>
       </div>
 
-      <div className="flex items-center gap-8 mb-6">
-        <Card className="p-4 bg-red-600/20 border-red-400">
-          <div className="text-center text-white">
-            <h3 className="text-2xl font-bold">TRUMP</h3>
-            <div className="text-4xl font-bold text-yellow-400">{gameState.trumpScore}</div>
-            <div className="text-sm opacity-75">Level {getTrumpLevel(gameState.trumpScore)}</div>
-          </div>
-        </Card>
-
-        <div className="flex gap-2">
-          <Button 
-            onClick={startGame} 
-            disabled={gameState.gameRunning && !gameState.gamePaused}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Start
-          </Button>
-          <Button 
-            onClick={pauseGame} 
-            disabled={!gameState.gameRunning}
-            className="bg-yellow-600 hover:bg-yellow-700"
-          >
-            <Pause className="w-4 h-4 mr-2" />
-            Pause
-          </Button>
-          <Button 
-            onClick={resetGame}
-            className="bg-red-600 hover:bg-red-700"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset
-          </Button>
-        </div>
-
-        <Card className="p-4 bg-blue-600/20 border-blue-400">
-          <div className="text-center text-white">
-            <h3 className="text-2xl font-bold">ELON</h3>
-            <div className="text-4xl font-bold text-cyan-400">{gameState.elonScore}</div>
-            <div className="text-sm opacity-75">Level {getElonLevel(gameState.elonScore)}</div>
-          </div>
-        </Card>
+      <div className="flex gap-2 mb-6">
+        <Button 
+          onClick={startGame} 
+          disabled={gameState.gameRunning && !gameState.gamePaused}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          Start
+        </Button>
+        <Button 
+          onClick={pauseGame} 
+          disabled={!gameState.gameRunning}
+          className="bg-yellow-600 hover:bg-yellow-700"
+        >
+          <Pause className="w-4 h-4 mr-2" />
+          Pause
+        </Button>
+        <Button 
+          onClick={resetGame}
+          className="bg-red-600 hover:bg-red-700"
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Reset
+        </Button>
       </div>
 
       <Card className="p-4 bg-black/50 border-2 border-yellow-400 shadow-2xl">
         <div 
           ref={gameRef}
-          className="relative bg-gradient-to-br from-purple-900 via-blue-900 to-black border-4 border-yellow-400 overflow-hidden"
+          className="relative border-4 border-yellow-400 overflow-hidden"
           style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}
         >
-          {/* Game Area Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-blue-500/10 animate-pulse" />
+          {/* Split Background - Red for Trump, Blue for Elon */}
+          <div className="absolute inset-0 flex">
+            <div className="w-1/2 bg-gradient-to-r from-red-600 to-red-500 opacity-80" />
+            <div className="w-1/2 bg-gradient-to-l from-blue-600 to-blue-500 opacity-80" />
+          </div>
           
-          {/* Trump Image on left side */}
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-24 h-32 opacity-30">
+          {/* Large Trump Image covering left half */}
+          <div className="absolute left-0 top-0 w-1/2 h-full flex items-center justify-center opacity-40">
             <img 
               src="/lovable-uploads/61aaf673-f181-4a2f-af83-a2b4668e6d60.png" 
               alt="Trump" 
-              className="w-full h-full object-contain"
+              className="w-4/5 h-4/5 object-contain"
             />
           </div>
 
-          {/* Elon Image on right side */}
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 w-24 h-32 opacity-30">
+          {/* Large Elon Image covering right half */}
+          <div className="absolute right-0 top-0 w-1/2 h-full flex items-center justify-center opacity-40">
             <img 
               src="/lovable-uploads/1768c633-a05b-4c95-8d92-79edad70f2be.png" 
               alt="Elon" 
-              className="w-full h-full object-contain"
+              className="w-4/5 h-4/5 object-contain"
             />
+          </div>
+
+          {/* Score Display Inside Board */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-8 z-10">
+            <div className="bg-red-600/80 text-white px-4 py-2 rounded-lg border-2 border-white">
+              <div className="text-center">
+                <div className="text-sm font-bold">TRUMP</div>
+                <div className="text-2xl font-bold text-yellow-400">{gameState.trumpScore}</div>
+              </div>
+            </div>
+            
+            <div className="text-4xl font-bold text-white">VS</div>
+            
+            <div className="bg-blue-600/80 text-white px-4 py-2 rounded-lg border-2 border-white">
+              <div className="text-center">
+                <div className="text-sm font-bold">ELON</div>
+                <div className="text-2xl font-bold text-cyan-400">{gameState.elonScore}</div>
+              </div>
+            </div>
           </div>
           
           {/* Trump Character */}
@@ -304,7 +307,7 @@ const TrumpElonPong = () => {
 
           {/* Center Line */}
           <div 
-            className="absolute bg-white/30 animate-pulse"
+            className="absolute bg-white/50 animate-pulse z-10"
             style={{
               left: GAME_WIDTH / 2 - 2,
               top: 0,
@@ -316,7 +319,7 @@ const TrumpElonPong = () => {
 
           {/* Game Paused Overlay */}
           {gameState.gamePaused && (
-            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
               <div className="text-6xl font-bold text-white animate-pulse">PAUSED</div>
             </div>
           )}
