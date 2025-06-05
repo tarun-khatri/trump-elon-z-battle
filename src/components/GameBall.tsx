@@ -10,18 +10,23 @@ interface GameBallProps {
 const GameBall: React.FC<GameBallProps> = ({ x, y, size }) => {
   return (
     <div
-      className="absolute rounded-full bg-gradient-to-br from-white to-yellow-300 border-2 border-yellow-400 shadow-lg animate-pulse"
+      className="absolute flex items-center justify-center bg-gradient-to-br from-white to-yellow-100 border-2 border-yellow-600 shadow-lg animate-spin rounded-lg"
       style={{
         left: x,
         top: y,
         width: size,
         height: size,
-        boxShadow: '0 0 20px rgba(255, 255, 0, 0.6), 0 0 40px rgba(255, 255, 0, 0.4)',
+        boxShadow: '0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4)',
       }}
     >
-      {/* Ball energy effect */}
-      <div className="absolute inset-1 rounded-full bg-gradient-to-br from-yellow-200 to-orange-300 animate-spin">
-        <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white to-transparent" />
+      {/* Bill Document Icon */}
+      <div className="text-lg font-bold text-center">
+        📄
+      </div>
+      
+      {/* Add "BILL" text for clarity */}
+      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white bg-black/50 px-1 rounded">
+        BILL
       </div>
     </div>
   );
